@@ -1,0 +1,90 @@
+pipeline:
+  name: "default_pipeline"
+  description: "Pipeline de dados genérico e reutilizável"
+  version: "1.0.0"
+  execution:
+    max_retries: 3
+    retry_delay_seconds: 5
+    timeout_minutes: 60
+
+extract:
+  source: "csv"
+  csv:
+    path: "data/raw/input.csv"
+    delimiter: ","
+    encoding: "utf-8"
+    has_header: true
+    chunksize: 10000
+  api:
+    url: ""
+    method: "GET"
+    headers:
+      Content-Type: "application/json"
+    params: {}
+    pagination:
+      enabled: false
+      page_size: 100
+      max_pages: 10
+  sql:
+    connection_string: ""
+    query: ""
+    chunk_size: 10000
+
+transform:
+  steps:
+    - name: "clean_missing_values"
+      enabled: true
+      strategy: "drop"
+      columns: []
+    - name: "remove_duplicates"
+      enabled: true
+      subset: []
+    - name: "convert_dtypes"
+      enabled: true
+      mapping: {}
+    - name: "rename_columns"
+      enabled: false
+      mapping: {}
+    - name: "filter_rows"
+      enabled: false
+      condition: ""
+    - name: "add_metadata"
+      enabled: true
+      columns:
+        - name: "processed_at"
+          type: "timestamp"
+        - name: "pipeline_version"
+
+load:
+  target: "csv"
+  csv:
+    path: "data/output/result.csv"
+    delimiter: ","
+    encoding: "utf-8"
+    mode: "overwrite"
+  sql:
+    connection_string: ""
+    table: ""
+    if_exists: "replace"
+
+quality:
+  enabled: true
+  checks:
+    - name: "check_null_values"
+      enabled: true
+      threshold: 0.1
+    - name: "check_unique_values"
+      enabled: true
+      columns: []
+    - name: "check_value_range"
+      enabled: false
+      rules: {}
+    - name: "check_schema"
+      enabled: true
+      expected_schema: {}
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/pipeline.log"
+  console: true
