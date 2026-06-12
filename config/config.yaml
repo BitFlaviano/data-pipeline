@@ -1,6 +1,6 @@
 pipeline:
-  name: "default_pipeline"
-  description: "Pipeline de dados genérico e reutilizável"
+  name: "vendas_pipeline"
+  description: "Pipeline de processamento de vendas - dados de exemplo"
   version: "1.0.0"
   execution:
     max_retries: 3
@@ -10,7 +10,7 @@ pipeline:
 extract:
   source: "csv"
   csv:
-    path: "data/raw/input.csv"
+    path: "data/raw/vendas.csv"
     delimiter: ","
     encoding: "utf-8"
     has_header: true
@@ -77,11 +77,21 @@ quality:
       enabled: true
       columns: []
     - name: "check_value_range"
-      enabled: false
-      rules: {}
+      enabled: true
+      rules:
+        preco_unitario: [0, 10000]
+        quantidade: [1, 100]
     - name: "check_schema"
       enabled: true
-      expected_schema: {}
+      expected_schema:
+        id: int64
+        produto: object
+        categoria: object
+        quantidade: int64
+        preco_unitario: float64
+        data_venda: object
+        cliente: object
+        regiao: object
 
 logging:
   level: "INFO"

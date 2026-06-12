@@ -49,8 +49,8 @@ class PipelineContext:
 
 class PipelineOrchestrator:
     def __init__(self, config_path: str):
-        self.config = self._load_config(config_path)
         self.logger = PipelineLogger.get_logger_for_module("pipeline")
+        self.config = self._load_config(config_path)
         self.context = PipelineContext(
             pipeline_name=self.config["pipeline"]["name"]
         )
